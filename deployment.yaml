@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javaserver
+  labels:
+    app: javaserver
+spec:
+  selector:
+    matchLabels:
+      app: javaserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "javaserver"
+    spec:
+      containers:
+        - name: javaserver
+          image: "danilotiago/demo-java-project-kubernetes:v7"
+
+          startupProbe: # faz a verificacao inicial se a aplicacao esta pronta, liberando o readiness e o liveness
+            httpGet: # usa o HTTP com GET
+              path: /actuator/health/readiness # path de readiness
+              port: 8080 # porta do container
+            # abaixo o tempo de espera pra definir se aplicacao subiu ou nao sera 5x40 = 3,33 minutos
+            # nao necessita mais do initialDelaySeconds em readinessProbe e livenessProbe pois aqui ja define se a aplicacao subiu ou nao
+            periodSeconds: 5 # a cada 5 segundos verifica se a aplicacao esta pronta
+            failureThreshold: 40 # quantas vezes pode dar erro pro kubernetes nao liberar o trafego
+
+          readinessProbe: # faz a verificacao se a aplicacao esta pronta para receber tráfego
+            httpGet: # usa o HTTP com GET
+              path: /actuator/health/readiness # path de readiness
+              port: 8080 # porta do container
+            periodSeconds: 5 # a cada 5 segundos verifica se a aplicacao esta pronta
+            failureThreshold: 1 # quantas vezes pode dar erro pro kubernetes nao liberar o trafego
+            timeoutSeconds: 2 # quantos segundos pode esperar pra definir que o container nao esta saudavel (timeout)
+            successThreshold: 1 # quantas vezes tem que dar sucesso para definir que o container pode receber trafego
+
+          livenessProbe: # faz a verificacao se aplicacao continua saudavel
+            httpGet: # usa o HTTP com GET
+              path: /actuator/health/liveness # path de liveness
+              port: 8080 # porta do container
+            periodSeconds: 5 # a cada 5 segundos verifica se esta ok
+            failureThreshold: 1 # quantas vezes pode dar erro pro kubernetes reiniciar o container
+            timeoutSeconds: 2 # quantos segundos pode esperar pra definir que o container nao esta saudavel (timeout)
+            successThreshold: 1 # quantas vezes tem que dar sucesso para definir que o container esta saudavel
+              
+          envFrom:
+            - configMapRef:
+                name: javaserver-env
+            - secretRef: # configura pra usar a secret
+                name: javaserver-secret # nome do objeto de secret criado
+              
+          volumeMounts: # montagem de volume
+            - mountPath: "/files" # path do volume dentro do container
+              name: hello # nome do volume (nome do volume que foi criado abaixo)
+          
+      volumes:
+        - name: hello # nome do volume
+          configMap: # volume do tipo configmap
+            name: configmap-hello # nome do configmap
+            items:
+            - key: infos # from data configmap-hello.yaml
+              path: "hello.txt" # nome do arquivo que sera gerado
+
+          # env:
+          #   - name: MYSQL_HOST
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: javaserver-env
+          #         key: MYSQL_HOST
+          #   - name: MYSQL_PORT
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: javaserver-env
+          #         key: MYSQL_PORT
+          #   - name: MYSQL_DATABASE
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: javaserver-env
+          #         key: MYSQL_DATABASE
+          #   - name: MYSQL_USERNAME
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: javaserver-env
+          #         key: MYSQL_USERNAME
+          #   - name: MYSQL_PASSWORD
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: javaserver-env
+          #         key: MYSQL_PASSWORD

@@ -1,0 +1,19 @@
+# apiVersion: apps/v1
+# kind: ReplicaSet
+# metadata:
+#   name: javaserver
+#   labels:
+#     app: javaserver
+# spec:
+#   selector:
+#     matchLabels:
+#       app: javaserver
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: "javaserver"
+#     spec:
+#       containers:
+#         - name: javaserver
+#           image: "danilotiago/demo-java-project-kubernetes:v2"

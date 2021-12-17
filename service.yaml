@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: javaserver-service
+spec:
+  selector:
+    app: javaserver
+  type: ClusterIP
+  ports: 
+  - name: avaserver-service # nome da porta
+    port: 80 # porta do service
+    targetPort: 8080 # porta do container
+    protocol: TCP # protocolo da porta

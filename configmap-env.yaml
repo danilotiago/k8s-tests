@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: javaserver-env
+data:
+  MYSQL_HOST: "99.99.9.99"
+  MYSQL_PORT: "3699"
+  MYSQL_DATABASE: "custom_from_configmap"
+  MYSQL_USERNAME: "myuser"
+  MYSQL_PASSWORD: "mypass"
