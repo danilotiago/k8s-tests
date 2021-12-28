@@ -5,6 +5,8 @@ metadata:
   labels:
     app: javaserver
 spec:
+  # namespace: dev # utiliza o namespace dev
+  # serviceAccount: server # utiliza o service account server
   selector:
     matchLabels:
       app: javaserver
