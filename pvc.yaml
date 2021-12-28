@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim # define um artefato de solicitacao de claim
+metadata:
+  name: javaserver-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # define o modo de acesso
+  resources:
+    requests:
+      storage: 5Gi # solicita 5gb

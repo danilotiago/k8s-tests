@@ -1,0 +1,12 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: javaserver-hpa
+spec:
+  scaleTargetRef: # qual objeto sera aplicado o HPA
+    apiVersion: apps/v1
+    kind: Deployment # define que sera aplicado no Deployment
+    name: javaserver
+  minReplicas: 1 # quantidade minima de replicas
+  maxReplicas: 10 # quantidade maxima de replicas
+  targetCPUUtilizationPercentage: 25 # quando passar de 75% cria mais pods, menos disso remove os pods extras

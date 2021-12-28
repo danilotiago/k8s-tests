@@ -18,6 +18,14 @@ spec:
         - name: javaserver
           image: "danilotiago/demo-java-project-kubernetes:v7"
 
+          resources: # recursos do pod
+            requests: # capacidade minima de recurso de cada pod
+              cpu: 500m
+              memory: 100Mi
+            limits: # capacidade maxima de recurso de cada pod
+              cpu: 2500m
+              memory: 500Mi
+
           startupProbe: # faz a verificacao inicial se a aplicacao esta pronta, liberando o readiness e o liveness
             httpGet: # usa o HTTP com GET
               path: /actuator/health/readiness # path de readiness
@@ -54,8 +62,14 @@ spec:
           volumeMounts: # montagem de volume
             - mountPath: "/files" # path do volume dentro do container
               name: hello # nome do volume (nome do volume que foi criado abaixo)
+            - mountPath: "/pvc"
+              name: javaserver-volume
           
       volumes:
+        - name: javaserver-volume
+          persistentVolumeClaim: # agora estamos usando um PVC
+            claimName: javaserver-pvc
+
         - name: hello # nome do volume
           configMap: # volume do tipo configmap
             name: configmap-hello # nome do configmap
